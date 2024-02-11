@@ -1,0 +1,353 @@
+/* General body styling */
+:root {
+    --background: #ffffff;
+    --text: #343641;
+    --border: #343641;
+    --dark_accent: #495057;
+    --light_accent: #e4e4e4;
+    --ball1: #343641;
+    --ball2: #252e8f;
+    --font-family: 'Roboto';
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    background-color: var(--background);
+    font-family: var(--font-family);
+    margin: 0;
+    padding: 0;
+    height: 90%;
+}
+
+.chat-container {
+    max-width: 600px;
+    margin: 50px auto;
+}
+
+.chat-header {
+    background-color: var(--border);
+    color: var(--background);
+    padding: 10px;
+    text-align: center;
+}
+
+.chat-body {
+    height: 400px;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.message {
+    padding: 5px 10px;
+    margin: 5px 0;
+    border-radius: 10px;
+    max-width: 75%;
+}
+
+.user-message {
+    color: (--text);
+    text-align: justify;
+    clear: both;
+    margin-right: 20%;
+    font-weight: 300;
+}
+
+.assistant-message {
+    color: var(--text);
+    text-align: justify;
+    text-align-last: right;
+    clear: both;
+    margin-left: 20%;
+    font-weight: 300;
+}
+
+.clearfix {
+    clear: both;
+}
+
+.chat-footer {
+    padding: 10px;
+}
+
+.chat-footer input {
+    width: calc(100% - 60px);
+    padding: 5px;
+}
+
+.chat-footer button {
+    width: 50px;
+    border: none;
+    padding: 5px 10px;
+    margin-left: 5px;
+}
+
+@media screen and (max-width: 600px) {
+    .chat-container {
+        width: 100%;
+        margin: 0;
+    }
+
+    .chat-footer input {
+        width: calc(100% - 70px);
+    }
+}
+
+.card {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+}
+
+.card-body {
+    color: var(--text);
+}
+
+.card-header {
+    color: var(--text);
+    font-size: 25px;
+    font-weight: 300;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    position: relative;
+}
+
+.card-title-highlight { 
+    font-weight: 500;
+    padding-right: 10px;
+}
+
+.card-footer {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+}
+
+.input-group {
+    border-radius: 15px;
+    border: 1px solid var(--text);
+    padding: 15px;
+}
+
+.input-group .row {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+.row {
+    height: 100%;
+}
+
+.form-control {
+    background-color: transparent;
+    border: transparent;
+    color: var(--text);
+}
+
+.btn {
+    border-radius: 15px;
+    background-color: var(--dark_accent);
+    border: transparent;
+}
+
+#userInput:focus {
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    outline: none;
+    color: var(--text);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.user-title {
+    font-weight: 600;
+    text-align: left;
+    padding-top: 30px;
+    font-size: 20px;
+}
+
+.user-title::before {
+    content: "You"
+}
+
+
+.assistant-title {
+    font-weight: 600;
+    text-align: right;
+    padding-top: 30px;
+    font-size: 20px;
+}
+
+.assistant-title::before {
+    content: "MattGPT"
+}
+
+.response {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    padding-bottom: 15px;
+}
+
+.card-header-subtitle {
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+
+.bouncing-balls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.bouncing-balls div {
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background: var(--ball1);
+    float: left;
+    margin: 0 3px;
+    background: var(--ball1);
+}
+
+.bouncing-balls .ball1 {
+    z-index: 1;
+    -moz-animation: bounce 1s infinite ease-in-out;
+    -webkit-animation: bounce 1s infinite ease-in-out;
+}
+
+.bouncing-balls .ball2 {
+    -moz-animation: bounce 1s infinite ease-in-out;
+    -webkit-animation: bounce 1s infinite ease-in-out;
+    -webkit-animation-delay: 0.25s;
+    animation-delay: 0.25s;
+}
+
+.bouncing-balls .ball3 {
+    -moz-animation: bounce 1s infinite ease-in-out;
+    -webkit-animation: bounce 1s infinite ease-in-out;
+    -webkit-animation-delay: 0.5s;
+    animation-delay: 0.50s;
+}
+
+@-moz-keyframes bounce {
+
+    0%,
+    15% {
+        -moz-transform: translate(0, 0);
+    }
+
+    50% {
+        -moz-transform: translate(0, -10px);
+        background: var(--ball2);
+    }
+
+    85%,
+    100% {
+        -moz-transform: translate(0, 0);
+    }
+
+    ;
+}
+
+@-webkit-keyframes bounce {
+
+    0%,
+    1% {
+        -webkit-transform: translate(0, 0);
+    }
+
+    50% {
+        -webkit-transform: translate(0, -10px);
+        background: var(--ball2);
+    }
+
+    60%,
+    100% {
+        -webkit-transform: translate(0, 0);
+    }
+
+    ;
+}
+
+.svg-class {
+    margin-bottom: 5px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.menu-button {
+    font-weight: 300;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    padding: 0px;
+}
+
+button:focus, input:focus, select:focus, textarea:focus {
+    outline: none;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    position: absolute;
+    display: none;
+    background-color: var(--background);
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px var(--dark_accent);
+    z-index: 1000;
+    margin: 4px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+}
+
+.dropdown-content a {
+    color: var(--text);
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-right: 35px;
+    text-decoration: none;
+    display: block;
+    font-size: 15px;
+}
+
+.linkedin {
+    fill: #343641;
+}
+
+.menu-items {
+    font-size: 15px;
+}
+
+input[type="radio"]+label {
+    cursor: pointer;
+}
+
+.radio-button-label {
+    padding-left: 20px;
+}
+
+input[type='radio'] {
+    accent-color: var(--border);
+}
+
+.rotate-90 {
+    transform: rotate(90deg);
+    transition: transform 0.3s ease-in-out; /* Smooth transition for the rotation */
+}
