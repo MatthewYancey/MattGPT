@@ -2,6 +2,10 @@ from flask import Flask, render_template, redirect, url_for, request, session, j
 from api_assistant import Assistant, Assistant_Test
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
+
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY')
 # assistant = Assistant_Test(3)

@@ -3,10 +3,14 @@ from openai import OpenAI
 import time
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
+
 class Assistant():
 
     def __init__(self):
-        self.client = OpenAI(api_key=os.getenv('OPENAIKEY'))
+        self.client = OpenAI(api_key=os.getenv('OPENAIKEY'), default_headers={"OpenAI-Beta": "assistants=v2"})
         self.assistant = self.client.beta.assistants.retrieve(assistant_id=os.getenv('ASSISTANTKEY'))
         self.thread = self.client.beta.threads.create()
 
