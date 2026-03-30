@@ -1,137 +1,172 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    var inputBox = document.getElementById('userInput');
-    var chatDisplay = document.getElementById('chatBody');
-    var defaultValues = ["When has Matt used LLMs?",
-        "Ask a question about Matt",
-        "What's his experience with Generative AI?",
-        "What did he do as a Research Scientist at Amazon?",
-        "What's Matt's favorite A24 film?",
-        "How did Matt make you?",
-        "What are projects where he used PyTorch?",
-        "Where does the author John Green live?"];
-    var currentIndex = 0;
-    var currentCharIndex = 0;
-    var typingSpeed = 50; // Speed of typing, in milliseconds
+    const inputBox = document.getElementById('userInput');
+    const messagesEl = document.getElementById('messages');
+    const defaultCards = document.getElementById('defaultCards');
+    let conversationStarted = false;
 
-    function typeText() {
-        if (currentCharIndex < defaultValues[currentIndex].length) {
-            inputBox.placeholder += defaultValues[currentIndex].charAt(currentCharIndex);
-            currentCharIndex++;
-            setTimeout(typeText, typingSpeed);
-        } else {
-            setTimeout(rotateText, 5000); // Wait for a bit before rotating to the next text
+    // ── Project card carousel ──
+    const cards = Array.from(document.querySelectorAll('.project-card'));
+    let activeIndex = 0;
+
+    // Keep --card-travel in sync with the container height so cards travel exactly the right distance
+    function updateTravelDistance() {
+        const h = defaultCards.offsetHeight;
+        defaultCards.style.setProperty('--card-travel', h + 'px');
+    }
+    updateTravelDistance();
+    window.addEventListener('resize', updateTravelDistance);
+
+    // Position all cards below to start, then show the first
+    cards.forEach((card, i) => {
+        card.classList.add(i === 0 ? 'active' : 'below');
+    });
+
+    function advanceCard() {
+        if (!conversationStarted) {
+            const current = cards[activeIndex];
+            activeIndex = (activeIndex + 1) % cards.length;
+            const next = cards[activeIndex];
+
+            // Both cards animate simultaneously — new one pushes old one out
+            current.classList.remove('active');
+            current.classList.add('above');
+            next.classList.remove('below');
+            next.classList.add('active');
+
+            // Reset outgoing card to below with no transition so it doesn't animate back down
+            setTimeout(() => {
+                current.style.transition = 'none';
+                current.classList.remove('above');
+                current.classList.add('below');
+                // Re-enable transition after the class swap has been painted
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        current.style.transition = '';
+                    });
+                });
+            }, 1000);
         }
     }
 
-    function rotateText() {
-        currentCharIndex = 0;
-        inputBox.placeholder = '';
-        currentIndex = (currentIndex + 1) % defaultValues.length;
-        typeText();
+    setInterval(advanceCard, 7000);
+
+    // ── Placeholder typing effect ──
+    const placeholders = [
+        "When has Matt used LLMs?",
+        "What did he do as a Research Scientist at Amazon?",
+        "What's his experience with Generative AI?",
+        "What are projects where he used PyTorch?",
+        "How did Matt get into machine learning?"
+    ];
+    let placeholderIndex = 0;
+    let charIndex = 0;
+
+    function typePlaceholder() {
+        if (charIndex < placeholders[placeholderIndex].length) {
+            inputBox.placeholder += placeholders[placeholderIndex].charAt(charIndex);
+            charIndex++;
+            setTimeout(typePlaceholder, 50);
+        } else {
+            setTimeout(rotatePlaceholder, 3000);
+        }
     }
 
+    function rotatePlaceholder() {
+        charIndex = 0;
+        inputBox.placeholder = '';
+        placeholderIndex = (placeholderIndex + 1) % placeholders.length;
+        typePlaceholder();
+    }
+
+    typePlaceholder();
+
+    // ── Enter key submits ──
+    inputBox.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('submit').click();
+        }
+    });
+
+    // ── Form submit ──
     document.getElementById('message-form').addEventListener('submit', function (e) {
         e.preventDefault();
-        var userMessage = inputBox.value;
-        
-        chatDisplay.innerHTML += '<div class="user-title"></div>';
-        chatDisplay.innerHTML += '<div class="user-message">' + userMessage + '</div>';
-        scrollToBottom();
+        const userMessage = inputBox.value.trim();
+        if (!userMessage) return;
+
+        if (!conversationStarted) {
+            defaultCards.style.display = 'none';
+            conversationStarted = true;
+        }
+
+        addMessageCard('user', userMessage);
         inputBox.value = '';
-        
-        // Add loading indicator after user's message
-        setTimeout(function () {
-            // var loadingIndicator = createLoadingIndicator();
-            var loadingIndicator = document.createElement('div');
-            chatDisplay.innerHTML += '<div class="assistant-title"></div>';
-            loadingIndicator.id = 'loadingContainer';
-            if (document.getElementById('radio-gpt').checked) {
-                loadingIndicator.innerHTML = '<div class="bouncing-balls" id="loader"><div class="ball1"></div><div class="ball2"></div><div class="ball3"></div></div>';
-            } else {
-                loadingIndicator.innerHTML = '<div class="loader" id="loader"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
-            }
-            chatDisplay.appendChild(loadingIndicator);
-            scrollToBottom();
-        }, 500);
+        inputBox.placeholder = '';
+
+        // Loading card
+        const loadingCard = document.createElement('div');
+        loadingCard.id = 'loadingCard';
+        loadingCard.className = 'loading-card';
+        loadingCard.innerHTML = `
+            <div class="message-label" style="text-align:right;">MattGPT</div>
+            <div class="loader" style="justify-content:flex-end;">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        `;
+        messagesEl.appendChild(loadingCard);
+        scrollToBottom();
 
         fetch('/path-to-ajax-handler', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: userMessage })
         })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('loader').remove();
-                message = data.response.replace(/【.*?†.*?】/g, "");                
-                chatDisplay.innerHTML += '<div class="assistant-message">' + message + '</div>';
-                scrollToBottom();
-            })
-            .catch(error => {
-                // Remove loading indicator
-                document.getElementById('loader').remove();
-                console.error('Error:', error);
-            });
-
-
-        // function createLoadingIndicator() {
-        //     var loadingIndicator = document.createElement('div');
-        //     loadingIndicator.id = 'loadingContainer';
-        //     if (document.getElementById('radio-gpt').checked) {
-        //         loadingIndicator.innerHTML = '<div class="bouncing-balls"><div class="ball1"></div><div class="ball2"></div><div class="ball3"></div></div>';
-        //     } else {
-        //         loadingIndicator.innerHTML = '<div class="loader"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>'
-        //     }
-        //     return loadingIndicator;
-        // };
-
-        // Function to scroll to the bottom when new content is added
-        function scrollToBottom() {
-            var chatLog = document.getElementById('chatBody');
-            chatLog.scrollTop = chatLog.scrollHeight;
-        }
-
-        rotateText(); // Start the typing effect
-    });
-
-    // const svgElement = document.getElementById('menu-button');
-    // svgElement.addEventListener('click', () => {
-    //     svgElement.classList.toggle('rotate-90');
-    // });
-
-    // Event listener for clicks anywhere in the document
-    document.addEventListener('click', function(event) {
-        var dropdown_menu = document.getElementById('dropdown-menu');
-        // Check if the click is outside the dropdown menu
-        if (!dropdown_menu.contains(event.target) & dropdown_menu.style.display === 'block') {
-            dropdown_menu.style.display = 'none';
-            const svgElement = document.getElementById('menu-button');
-            svgElement.classList.toggle('rotate-90');
-        }
-    });
-
-    // Event listener for the menu button
-    document.querySelector('.menu-button').addEventListener('click', function(event) {
-        event.stopPropagation();
-        var dropdownContent = this.nextElementSibling;
-        dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
-        const svgElement = document.getElementById('menu-button');
-        svgElement.classList.toggle('rotate-90');
-    });
-
-    document.querySelectorAll('input[name="theme"]').forEach(function(elem) {
-        elem.addEventListener('change', function(event) {
-            var theme = event.target.value;
-            if (theme === 'gpt') {
-                document.getElementById('theme-style').href = 'static/gpt_theme.css';
-            } else if (theme === 'terminal') {
-                document.getElementById('theme-style').href = 'static/terminal_theme.css';
-            }
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('loadingCard').remove();
+            const text = data.response.replace(/【.*?†.*?】/g, '');
+            addMessageCard('assistant', text);
+        })
+        .catch(err => {
+            document.getElementById('loadingCard').remove();
+            addMessageCard('assistant', 'Sorry, something went wrong. Please try again.');
+            console.error(err);
         });
     });
 
-    rotateText();
+    // ── Helpers ──
+
+    function addMessageCard(role, text) {
+        const card = document.createElement('div');
+        card.className = `message-card ${role}`;
+
+        const label = role === 'user' ? 'You' : 'MattGPT';
+        const content = role === 'assistant'
+            ? marked.parse(text)
+            : escapeHtml(text);
+
+        card.innerHTML = `
+            <div class="message-label">${label}</div>
+            <div class="message-content">${content}</div>
+        `;
+        messagesEl.appendChild(card);
+        scrollToBottom();
+    }
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function scrollToBottom() {
+        const chatArea = document.getElementById('chatArea');
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
 
 });
