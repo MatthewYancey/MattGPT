@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const inputBox = document.getElementById('userInput');
     const messagesEl = document.getElementById('messages');
     const defaultCards = document.getElementById('defaultCards');
+    const emptyState = document.getElementById('emptyState');
     let conversationStarted = false;
 
     // ── Project card carousel ──
@@ -17,9 +18,15 @@ document.addEventListener('DOMContentLoaded', function () {
     updateTravelDistance();
     window.addEventListener('resize', updateTravelDistance);
 
-    // Position all cards below to start, then show the first
+    // Position all cards without transition so nothing animates on load
+    cards.forEach(card => { card.style.transition = 'none'; });
     cards.forEach((card, i) => {
         card.classList.add(i === 0 ? 'active' : 'below');
+    });
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            cards.forEach(card => { card.style.transition = ''; });
+        });
     });
 
     function advanceCard() {
@@ -97,12 +104,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!conversationStarted) {
             defaultCards.style.display = 'none';
+            emptyState.style.display = 'none';
             conversationStarted = true;
         }
 
         addMessageCard('user', userMessage);
         inputBox.value = '';
         inputBox.placeholder = '';
+        rotatePlaceholder();
 
         // Loading card
         const loadingCard = document.createElement('div');

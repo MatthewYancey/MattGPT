@@ -89,6 +89,26 @@ html, body {
     justify-content: flex-end;
 }
 
+/* ── Empty state ── */
+
+.empty-state {
+    text-align: center;
+    padding: 0 10px 28px;
+}
+
+.empty-state-headline {
+    font-family: var(--font-pixel);
+    font-size: 22px;
+    color: var(--text-user);
+    margin-bottom: 10px;
+}
+
+.empty-state-sub {
+    font-size: 14px;
+    color: var(--background-highlight);
+    line-height: 1.6;
+}
+
 /* ── Default project cards ── */
 
 .default-cards {
@@ -116,10 +136,12 @@ html, body {
 
 .project-card.above {
     transform: translateY(calc(-1 * var(--card-travel, 600px)));
+    box-shadow: none;
 }
 
 .project-card.below {
     transform: translateY(var(--card-travel, 600px));
+    box-shadow: none;
 }
 
 .project-card-title {
